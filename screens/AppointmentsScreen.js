@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useAppointments } from '../src/context/AppointmentContext';
 
@@ -27,7 +27,28 @@ const AppointmentsScreen = () => {
   }, [appointments]);
 
   const handleCancel = async (appointmentId) => {
-    await cancelAppointment(appointmentId);
+    Alert.alert(
+      'Cancel Appointment',
+      'Are you sure you want to cancel this appointment?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes, Cancel',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await cancelAppointment(appointmentId);
+              Alert.alert('Appointment Cancelled', 'The appointment status was updated to cancelled.');
+            } catch (error) {
+              Alert.alert('Unable to Cancel', error.message || 'Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const renderItem = ({ item }) => {
