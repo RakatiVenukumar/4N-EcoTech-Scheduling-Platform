@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ActivityIndicator, Alert, FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { useAppointments } from '../src/context/AppointmentContext';
 import AppButton from '../components/AppButton';
@@ -29,6 +29,25 @@ const AppointmentsScreen = () => {
   }, [appointments]);
 
   const handleCancel = async (appointmentId) => {
+    const executeCancel = async () => {
+      try {
+        await cancelAppointment(appointmentId);
+        Alert.alert('Appointment Cancelled', 'The appointment status was updated to cancelled.');
+      } catch (error) {
+        Alert.alert('Unable to Cancel', error.message || 'Please try again.');
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = globalThis.confirm('Are you sure you want to cancel this appointment?');
+      if (!confirmed) {
+        return;
+      }
+
+      await executeCancel();
+      return;
+    }
+
     Alert.alert(
       'Cancel Appointment',
       'Are you sure you want to cancel this appointment?',
@@ -40,14 +59,7 @@ const AppointmentsScreen = () => {
         {
           text: 'Yes, Cancel',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await cancelAppointment(appointmentId);
-              Alert.alert('Appointment Cancelled', 'The appointment status was updated to cancelled.');
-            } catch (error) {
-              Alert.alert('Unable to Cancel', error.message || 'Please try again.');
-            }
-          },
+          onPress: executeCancel,
         },
       ]
     );

@@ -13,7 +13,9 @@ const ProviderDetailsScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={{ uri: provider.profileImage }} style={styles.image} />
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: provider.profileImage }} style={styles.image} resizeMode="contain" />
+        </View>
 
         <View style={styles.card}>
           <Text style={styles.name}>{provider.name}</Text>
@@ -47,12 +49,19 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-  image: {
+  imageContainer: {
     width: '100%',
     height: 230,
     borderRadius: 14,
     marginBottom: 14,
     backgroundColor: Colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
   card: {
     backgroundColor: Colors.surface,

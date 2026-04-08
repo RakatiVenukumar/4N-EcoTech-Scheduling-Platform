@@ -63,6 +63,15 @@ export const AppointmentProvider = ({ children }) => {
     [currentUserEmail]
   );
 
+  const rescheduleAppointment = useCallback(
+    async (oldAppointmentId, newAppointment) => {
+      const nextAppointments = await appointmentService.rescheduleAppointment(oldAppointmentId, newAppointment, currentUserEmail);
+      setAllAppointments(nextAppointments);
+      return appointmentService.getAppointmentsByUser(nextAppointments, currentUserEmail);
+    },
+    [currentUserEmail]
+  );
+
   const value = useMemo(
     () => ({
       appointments: getAppointments(),
@@ -70,9 +79,10 @@ export const AppointmentProvider = ({ children }) => {
       error,
       bookAppointment,
       cancelAppointment,
+      rescheduleAppointment,
       getAppointments,
     }),
-    [getAppointments, isLoading, error, bookAppointment, cancelAppointment]
+    [getAppointments, isLoading, error, bookAppointment, cancelAppointment, rescheduleAppointment]
   );
 
   return <AppointmentContext.Provider value={value}>{children}</AppointmentContext.Provider>;

@@ -7,7 +7,9 @@ import { Colors } from '../constants/colors';
 const ProviderCard = ({ provider, onViewDetails }) => {
   return (
     <View style={styles.card}>
-      <Image source={{ uri: provider.profileImage }} style={styles.image} />
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: provider.profileImage }} style={styles.image} resizeMode="contain" />
+      </View>
 
       <View style={styles.content}>
         <Text style={styles.name}>{provider.name}</Text>
@@ -28,10 +30,16 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     overflow: 'hidden',
   },
-  image: {
+  imageContainer: {
     width: '100%',
     height: 170,
     backgroundColor: Colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
   content: {
     padding: 14,

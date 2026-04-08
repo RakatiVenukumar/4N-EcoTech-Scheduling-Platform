@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeStorage } from './safeStorage';
 
 const APPOINTMENTS_KEY = '@ecotech:appointments';
 
@@ -16,11 +16,11 @@ const parseOrFallback = (value, fallback) => {
 
 export const appointmentStorage = {
   async getAllAppointments() {
-    const rawAppointments = await AsyncStorage.getItem(APPOINTMENTS_KEY);
+    const rawAppointments = await safeStorage.getItem(APPOINTMENTS_KEY);
     return parseOrFallback(rawAppointments, []);
   },
 
   async saveAllAppointments(appointments) {
-    await AsyncStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    await safeStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
   },
 };

@@ -19,25 +19,58 @@ const formatTime = (date) => {
   });
 };
 
-const BookAppointmentScreen = ({ route }) => {
+const BookAppointmentScreen = ({ route, navigation }) => {
   const { provider } = route.params;
   const { currentUser } = useAuth();
-  const { bookAppointment } = useAppointments();
+  const { appointments, bookAppointment, rescheduleAppointment } = useAppointments();
 
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [appointment, setAppointment] = useState(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookedAppointment, setBookedAppointment] = useState(null);
+  const [rescheduleSlot, setRescheduleSlot] = useState(null);
 
   const slotOptions = useMemo(() => provider?.availableSlots ?? [], [provider]);
+  const hasActiveAppointmentWithProvider = useMemo(
+    () => appointments.some((item) => item.providerName === provider.name && item.status !== 'cancelled'),
+    [appointments, provider.name]
+  );
+
+  const bookedSlotKeys = useMemo(() => {
+    return new Set(
+      appointments
+        .filter((item) => item.providerName === provider.name && item.status !== 'cancelled')
+        .map((item) => `${item.date}|${item.time}`)
+    );
+  }, [appointments, provider.name]);
 
   useEffect(() => {
     if (!currentUser?.email) {
       setError('Please log in again to continue booking.');
+      return;
     }
-  }, [currentUser]);
+
+    if (hasActiveAppointmentWithProvider) {
+      setError(`You already have an active appointment with ${provider.name}. Cancel it before booking another one.`);
+      // Automatically show the reschedule UI if user has an active appointment
+      const existingAppointment = appointments.find(
+        (item) => item.providerName === provider.name && item.status !== 'cancelled'
+      );
+      if (existingAppointment) {
+        setBookedAppointment(existingAppointment);
+      }
+    } else {
+      // Clear the booked appointment UI if no active appointment
+      setBookedAppointment(null);
+    }
+  }, [currentUser, hasActiveAppointmentWithProvider, provider.name, appointments]);
 
   const handleSelectSlot = (slotValue) => {
+    if (hasActiveAppointmentWithProvider) {
+      return;
+    }
+
     const slotDate = new Date(slotValue);
     const nextAppointment = {
       id: `apt-${Date.now()}`,
@@ -63,6 +96,11 @@ const BookAppointmentScreen = ({ route }) => {
       return;
     }
 
+    if (hasActiveAppointmentWithProvider) {
+      setError(`You already have an active appointment with ${provider.name}. Cancel it before booking another one.`);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       await bookAppointment(appointment);
@@ -74,61 +112,172 @@ const BookAppointmentScreen = ({ route }) => {
       setIsSubmitting(false);
     }
 
-    Alert.alert(
-      'Booking Confirmed',
-      `${appointment.providerName} on ${appointment.date} at ${appointment.time}`
-    );
-
+    // Show booked confirmation instead of alert - allow user to reschedule
+    setBookedAppointment(appointment);
     setSelectedSlot(null);
     setAppointment(null);
+    setRescheduleSlot(null);
+  };
+
+  const handleReschedule = async () => {
+    if (!rescheduleSlot) {
+      setError('Please select a new slot to reschedule.');
+      return;
+    }
+
+    if (!currentUser?.email) {
+      setError('Please log in again to continue.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const newAppointment = {
+        providerName: provider.name,
+        time: formatTime(new Date(rescheduleSlot)),
+        date: formatDate(new Date(rescheduleSlot)),
+        userEmail: currentUser?.email ?? '',
+        status: 'pending',
+      };
+
+      await rescheduleAppointment(bookedAppointment.id, newAppointment);
+      setError('');
+      setBookedAppointment({...newAppointment, id: bookedAppointment.id});
+      setRescheduleSlot(null);
+    } catch (error) {
+      setError(error.message || 'Unable to reschedule appointment.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDone = () => {
+    setBookedAppointment(null);
+    navigation.navigate('Home');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Book Appointment</Text>
-        <Text style={styles.subtitle}>Choose a slot with {provider.name}</Text>
+        {!bookedAppointment ? (
+          <>
+            <Text style={styles.title}>Book Appointment</Text>
+            <Text style={styles.subtitle}>Choose a slot with {provider.name}</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Available Slots</Text>
-          {slotOptions.length === 0 ? <Text style={styles.emptyMessage}>No slots currently available.</Text> : null}
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>Available Slots</Text>
+              {slotOptions.length === 0 ? <Text style={styles.emptyMessage}>No slots currently available.</Text> : null}
 
-          {slotOptions.map((slot) => {
-            const isSelected = selectedSlot === slot;
+              {slotOptions.map((slot) => {
+                const isSelected = selectedSlot === slot;
+                const slotDate = new Date(slot);
+                const slotKey = `${formatDate(slotDate)}|${formatTime(slotDate)}`;
+                const isAlreadyBooked = bookedSlotKeys.has(slotKey);
 
-            return (
-              <TouchableOpacity
-                key={slot}
-                style={[styles.slotButton, isSelected ? styles.slotButtonSelected : null]}
-                onPress={() => handleSelectSlot(slot)}>
-                <Text style={[styles.slotText, isSelected ? styles.slotTextSelected : null]}>
-                  {new Date(slot).toLocaleString()}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                return (
+                  <TouchableOpacity
+                    key={slot}
+                    style={[
+                      styles.slotButton,
+                      isSelected ? styles.slotButtonSelected : null,
+                      isAlreadyBooked || hasActiveAppointmentWithProvider ? styles.slotButtonDisabled : null,
+                    ]}
+                    onPress={() => handleSelectSlot(slot)}
+                    disabled={isAlreadyBooked || hasActiveAppointmentWithProvider}>
+                    <Text
+                      style={[
+                        styles.slotText,
+                        isSelected ? styles.slotTextSelected : null,
+                        isAlreadyBooked ? styles.slotTextDisabled : null,
+                      ]}>
+                      {new Date(slot).toLocaleString()}
+                    </Text>
+                    {isAlreadyBooked ? <Text style={styles.bookedTag}>Already booked</Text> : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
-        {appointment ? (
-          <View style={styles.summaryCard}>
-            <Text style={styles.sectionTitle}>Appointment Preview</Text>
-            <Text style={styles.summaryItem}>id: {appointment.id}</Text>
-            <Text style={styles.summaryItem}>providerName: {appointment.providerName}</Text>
-            <Text style={styles.summaryItem}>time: {appointment.time}</Text>
-            <Text style={styles.summaryItem}>date: {appointment.date}</Text>
-            <Text style={styles.summaryItem}>userEmail: {appointment.userEmail || 'guest@example.com'}</Text>
-            <Text style={styles.summaryItem}>status: {appointment.status}</Text>
-          </View>
-        ) : null}
+            {appointment ? (
+              <View style={styles.summaryCard}>
+                <Text style={styles.sectionTitle}>Appointment Preview</Text>
+                <Text style={styles.summaryItem}>id: {appointment.id}</Text>
+                <Text style={styles.summaryItem}>providerName: {appointment.providerName}</Text>
+                <Text style={styles.summaryItem}>time: {appointment.time}</Text>
+                <Text style={styles.summaryItem}>date: {appointment.date}</Text>
+                <Text style={styles.summaryItem}>userEmail: {appointment.userEmail || 'guest@example.com'}</Text>
+                <Text style={styles.summaryItem}>status: {appointment.status}</Text>
+              </View>
+            ) : null}
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <AppButton
-          title="Confirm Booking"
-          onPress={handleConfirmBooking}
-          disabled={!appointment}
-          loading={isSubmitting}
-        />
+            <AppButton
+              title="Confirm Booking"
+              onPress={handleConfirmBooking}
+              disabled={!appointment || hasActiveAppointmentWithProvider}
+              loading={isSubmitting}
+            />
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>Booking Confirmed! ✓</Text>
+            <Text style={styles.subtitle}>{bookedAppointment.providerName}</Text>
+
+            <View style={styles.successCard}>
+              <Text style={styles.sectionTitle}>Your Appointment</Text>
+              <Text style={styles.successItem}>📅 Date: {bookedAppointment.date}</Text>
+              <Text style={styles.successItem}>🕐 Time: {bookedAppointment.time}</Text>
+              <Text style={styles.successItem}>👤 Provider: {bookedAppointment.providerName}</Text>
+            </View>
+
+            <View style={styles.separatorCard}>
+              <Text style={styles.sectionTitle}>Change to a Different Slot</Text>
+              {slotOptions.length === 0 ? <Text style={styles.emptyMessage}>No other slots available.</Text> : null}
+
+              {slotOptions.map((slot) => {
+                const slotDate = new Date(slot);
+                const slotKey = `${formatDate(slotDate)}|${formatTime(slotDate)}`;
+                const isCurrentSlot = slotKey === `${bookedAppointment.date}|${bookedAppointment.time}`;
+                const isRescheduleSelected = rescheduleSlot === slot;
+                const isAlreadyBooked = bookedSlotKeys.has(slotKey) && !isCurrentSlot;
+
+                return (
+                  <TouchableOpacity
+                    key={slot}
+                    style={[
+                      styles.slotButton,
+                      isRescheduleSelected ? styles.slotButtonSelected : null,
+                      isCurrentSlot ? styles.slotButtonDisabled : null,
+                      isAlreadyBooked ? styles.slotButtonDisabled : null,
+                    ]}
+                    onPress={() => !isCurrentSlot && !isAlreadyBooked && setRescheduleSlot(slot)}
+                    disabled={isCurrentSlot || isAlreadyBooked}>
+                    <Text
+                      style={[
+                        styles.slotText,
+                        isRescheduleSelected ? styles.slotTextSelected : null,
+                        isCurrentSlot || isAlreadyBooked ? styles.slotTextDisabled : null,
+                      ]}>
+                      {new Date(slot).toLocaleString()}
+                    </Text>
+                    {isCurrentSlot ? <Text style={styles.currentTag}>Current Slot</Text> : null}
+                    {isAlreadyBooked && !isCurrentSlot ? <Text style={styles.bookedTag}>Already booked</Text> : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <AppButton
+              title={rescheduleSlot ? 'Confirm Reschedule' : 'Skip'}
+              onPress={rescheduleSlot ? handleReschedule : handleDone}
+              variant={rescheduleSlot ? 'primary' : 'secondary'}
+              loading={isSubmitting}
+            />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -181,12 +330,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.slotSelected,
     borderColor: Colors.primary,
   },
+  slotButtonDisabled: {
+    backgroundColor: Colors.infoSoft,
+    borderColor: Colors.border,
+    opacity: 0.75,
+  },
   slotText: {
     color: Colors.textPrimary,
     fontWeight: '500',
   },
   slotTextSelected: {
     color: Colors.primaryPressed,
+  },
+  slotTextDisabled: {
+    color: Colors.textSecondary,
+  },
+  bookedTag: {
+    marginTop: 4,
+    color: Colors.danger,
+    fontSize: 12,
+    fontWeight: '600',
   },
   summaryCard: {
     backgroundColor: Colors.surface,
@@ -212,6 +375,34 @@ const styles = StyleSheet.create({
     color: Colors.danger,
     marginBottom: 10,
     fontSize: 13,
+  },
+  successCard: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    padding: 14,
+    marginBottom: 14,
+  },
+  successItem: {
+    color: '#2E7D32',
+    marginBottom: 6,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  separatorCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 14,
+    marginBottom: 14,
+  },
+  currentTag: {
+    marginTop: 4,
+    color: Colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 
