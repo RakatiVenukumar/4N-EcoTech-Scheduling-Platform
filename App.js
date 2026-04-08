@@ -1,1 +1,3 @@
-export { default } from './src/App';
+import AppNavigator from './navigation/AppNavigator';
+
+export default AppNavigator;
