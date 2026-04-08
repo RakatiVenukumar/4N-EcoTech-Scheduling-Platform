@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   const register = useCallback(async (user) => {
     const state = await authService.register(user);
     setUsers(state.users);
-    setCurrentUser(state.currentUser);
+    setCurrentUser(state.currentUser ?? null);
     return state.currentUser;
   }, []);
 

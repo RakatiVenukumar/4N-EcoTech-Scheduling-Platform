@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../src/context/AuthContext';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    try {
+      await login(email, password);
+      setError('');
+      navigation.replace('Home');
+    } catch (authError) {
+      setError(authError.message || 'Invalid email or password.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,7 +52,9 @@ const LoginScreen = ({ navigation }) => {
             style={styles.input}
           />
 
-          <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.replace('Home')}>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
             <Text style={styles.primaryButtonText}>Login</Text>
           </TouchableOpacity>
 
@@ -89,6 +109,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 14,
     backgroundColor: '#FFFFFF',
+  },
+  errorText: {
+    color: '#DC2626',
+    marginBottom: 10,
+    fontSize: 13,
   },
   primaryButton: {
     backgroundColor: '#0EA5E9',

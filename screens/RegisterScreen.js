@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../src/context/AuthContext';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { register } = useAuth();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim()) {
       setError('All fields are required.');
       return;
     }
 
-    setError('');
-    navigation.replace('Home');
+    try {
+      await register({ name, email, password });
+      setError('');
+      navigation.replace('Login');
+    } catch (registerError) {
+      setError(registerError.message || 'Unable to register user.');
+    }
   };
 
   return (

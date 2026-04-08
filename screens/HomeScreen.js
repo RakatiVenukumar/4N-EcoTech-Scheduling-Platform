@@ -1,13 +1,23 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../src/context/AuthContext';
 
 const HomeScreen = ({ navigation }) => {
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigation.replace('Login');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Home</Text>
-      <Text style={styles.subtitle}>You are now inside the app.</Text>
+      <Text style={styles.subtitle}>
+        {currentUser ? `Welcome, ${currentUser.name}.` : 'You are now inside the app.'}
+      </Text>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.replace('Login')}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
     </View>

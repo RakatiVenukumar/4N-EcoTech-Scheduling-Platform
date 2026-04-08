@@ -41,11 +41,10 @@ export const authService = {
     const nextUsers = [...users, newUser];
 
     await authStorage.saveUsers(nextUsers);
-    await authStorage.saveSessionUser(newUser);
 
     return {
       users: nextUsers,
-      currentUser: newUser,
+      currentUser: null,
     };
   },
 
