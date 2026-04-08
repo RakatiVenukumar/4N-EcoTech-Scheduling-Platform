@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
+import { useAppointments } from '../src/context/AppointmentContext';
 
 const formatDate = (date) => {
   const year = date.getFullYear();
@@ -19,6 +20,7 @@ const formatTime = (date) => {
 const BookAppointmentScreen = ({ route }) => {
   const { provider } = route.params;
   const { currentUser } = useAuth();
+  const { bookAppointment } = useAppointments();
 
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [appointment, setAppointment] = useState(null);
@@ -40,8 +42,15 @@ const BookAppointmentScreen = ({ route }) => {
     setAppointment(nextAppointment);
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (!appointment) {
+      return;
+    }
+
+    try {
+      await bookAppointment(appointment);
+    } catch (error) {
+      Alert.alert('Booking Failed', error.message || 'Unable to book appointment.');
       return;
     }
 
