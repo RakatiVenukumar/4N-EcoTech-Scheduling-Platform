@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
-import { Alert, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { useAppointments } from '../src/context/AppointmentContext';
+import AppButton from '../components/AppButton';
+import { Colors } from '../constants/colors';
 
 const AppointmentsScreen = () => {
-  const { appointments, cancelAppointment } = useAppointments();
+  const { appointments, cancelAppointment, isLoading } = useAppointments();
 
   const upcomingAppointments = useMemo(() => {
     const today = new Date();
@@ -59,12 +61,21 @@ const AppointmentsScreen = () => {
         <Text style={styles.meta}>Date: {item.date}</Text>
         <Text style={styles.meta}>Status: {item.status}</Text>
 
-        <TouchableOpacity style={styles.cancelButton} onPress={() => handleCancel(item.id)}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
+        <AppButton title="Cancel" variant="secondary" onPress={() => handleCancel(item.id)} />
       </View>
     );
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loaderText}>Loading appointments...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -74,7 +85,12 @@ const AppointmentsScreen = () => {
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={<Text style={styles.title}>Upcoming Appointments</Text>}
-        ListEmptyComponent={<Text style={styles.emptyState}>No upcoming appointments found.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyTitle}>No upcoming appointments</Text>
+            <Text style={styles.emptyState}>You have no bookings right now. Book one from a provider profile.</Text>
+          </View>
+        }
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -84,7 +100,7 @@ const AppointmentsScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: Colors.background,
   },
   listContent: {
     padding: 16,
@@ -93,45 +109,54 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
     borderRadius: 12,
-    padding: 14,
+    padding: 16,
     marginBottom: 12,
+    gap: 2,
   },
   providerName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
   meta: {
     fontSize: 14,
-    color: '#334155',
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
-  cancelButton: {
+  emptyContainer: {
+    backgroundColor: Colors.infoSoft,
+    borderRadius: 14,
+    padding: 16,
     marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#F87171',
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: '#FFF1F2',
   },
-  cancelButtonText: {
-    color: '#B91C1C',
-    fontWeight: '600',
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    marginBottom: 6,
   },
   emptyState: {
-    marginTop: 20,
-    color: '#64748B',
-    fontSize: 15,
+    color: Colors.textSecondary,
+    fontSize: 14,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  loaderText: {
+    color: Colors.textSecondary,
+    fontSize: 14,
   },
 });
 

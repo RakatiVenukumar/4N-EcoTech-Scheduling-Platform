@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppointments } from '../src/context/AppointmentContext';
+import AppButton from '../components/AppButton';
+import { Colors } from '../constants/colors';
 
 const formatDate = (date) => {
   const year = date.getFullYear();
@@ -24,6 +26,8 @@ const BookAppointmentScreen = ({ route }) => {
 
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [appointment, setAppointment] = useState(null);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const slotOptions = useMemo(() => provider?.availableSlots ?? [], [provider]);
 
@@ -48,10 +52,14 @@ const BookAppointmentScreen = ({ route }) => {
     }
 
     try {
+      setIsSubmitting(true);
       await bookAppointment(appointment);
+      setError('');
     } catch (error) {
-      Alert.alert('Booking Failed', error.message || 'Unable to book appointment.');
+      setError(error.message || 'Unable to book appointment.');
       return;
+    } finally {
+      setIsSubmitting(false);
     }
 
     Alert.alert(
@@ -68,6 +76,8 @@ const BookAppointmentScreen = ({ route }) => {
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Available Slots</Text>
+          {slotOptions.length === 0 ? <Text style={styles.emptyMessage}>No slots currently available.</Text> : null}
+
           {slotOptions.map((slot) => {
             const isSelected = selectedSlot === slot;
 
@@ -96,12 +106,14 @@ const BookAppointmentScreen = ({ route }) => {
           </View>
         ) : null}
 
-        <TouchableOpacity
-          style={[styles.confirmButton, !appointment ? styles.confirmButtonDisabled : null]}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <AppButton
+          title="Confirm Booking"
           onPress={handleConfirmBooking}
-          disabled={!appointment}>
-          <Text style={styles.confirmButtonText}>Confirm Booking</Text>
-        </TouchableOpacity>
+          disabled={!appointment}
+          loading={isSubmitting}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -110,7 +122,7 @@ const BookAppointmentScreen = ({ route }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: Colors.background,
   },
   container: {
     padding: 16,
@@ -119,73 +131,72 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
   subtitle: {
-    color: '#475569',
+    color: Colors.textSecondary,
     fontSize: 15,
     marginBottom: 14,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
     padding: 14,
     marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1E293B',
+    color: Colors.textPrimary,
     marginBottom: 8,
   },
   slotButton: {
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: Colors.border,
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     marginBottom: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   slotButtonSelected: {
-    backgroundColor: '#E0F2FE',
-    borderColor: '#0EA5E9',
+    backgroundColor: Colors.slotSelected,
+    borderColor: Colors.primary,
   },
   slotText: {
-    color: '#0F172A',
+    color: Colors.textPrimary,
     fontWeight: '500',
   },
   slotTextSelected: {
-    color: '#0369A1',
+    color: Colors.primaryPressed,
   },
   summaryCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
     padding: 14,
     marginBottom: 14,
   },
   summaryItem: {
-    color: '#334155',
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
-  confirmButton: {
-    backgroundColor: '#0EA5E9',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
+  emptyMessage: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    backgroundColor: Colors.infoSoft,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
-  confirmButtonDisabled: {
-    backgroundColor: '#94A3B8',
-  },
-  confirmButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
+  errorText: {
+    color: Colors.danger,
+    marginBottom: 10,
+    fontSize: 13,
   },
 });
 

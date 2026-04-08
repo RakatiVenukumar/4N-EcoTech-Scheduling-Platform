@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
+import AppButton from '../components/AppButton';
+import { Colors } from '../constants/colors';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useAuth();
 
   const handleRegister = async () => {
@@ -16,11 +19,14 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
+      setIsSubmitting(true);
       await register({ name, email, password });
       setError('');
       navigation.replace('Login');
     } catch (registerError) {
       setError(registerError.message || 'Unable to register user.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,13 +71,19 @@ const RegisterScreen = ({ navigation }) => {
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-            <Text style={styles.primaryButtonText}>Register</Text>
-          </TouchableOpacity>
+          <AppButton
+            title="Register"
+            onPress={handleRegister}
+            loading={isSubmitting}
+            style={styles.buttonSpacing}
+          />
 
-          <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.secondaryButtonText}>Back to login</Text>
-          </TouchableOpacity>
+          <AppButton
+            title="Back to login"
+            variant="secondary"
+            onPress={() => navigation.navigate('Login')}
+            disabled={isSubmitting}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -81,7 +93,7 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
@@ -91,61 +103,44 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#475569',
+    color: Colors.textSecondary,
     marginBottom: 28,
   },
   formCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 16,
+    padding: 18,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
+    gap: 4,
   },
   label: {
     fontSize: 14,
-    color: '#334155',
+    color: Colors.textSecondary,
     marginBottom: 8,
     fontWeight: '600',
   },
   input: {
-    height: 48,
+    height: 50,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: Colors.border,
     borderRadius: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     marginBottom: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   errorText: {
-    color: '#DC2626',
+    color: Colors.danger,
     marginBottom: 10,
     fontSize: 13,
   },
-  primaryButton: {
-    backgroundColor: '#0EA5E9',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
+  buttonSpacing: {
     marginBottom: 12,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#0EA5E9',
-    fontSize: 15,
-    fontWeight: '500',
   },
 });
 

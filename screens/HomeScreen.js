@@ -1,8 +1,10 @@
 import React from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import providers from '../data/providers';
 import ProviderCard from '../components/ProviderCard';
+import AppButton from '../components/AppButton';
+import { Colors } from '../constants/colors';
 
 const HomeScreen = ({ navigation }) => {
   const { currentUser, logout } = useAuth();
@@ -25,15 +27,17 @@ const HomeScreen = ({ navigation }) => {
     </View>
   );
 
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyTitle}>No providers available</Text>
+      <Text style={styles.emptySubtitle}>Please check back later for new service providers.</Text>
+    </View>
+  );
+
   const renderFooter = () => (
     <>
-      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Appointments')}>
-        <Text style={styles.secondaryButtonText}>View Appointments</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
+      <AppButton title="View Appointments" onPress={() => navigation.navigate('Appointments')} />
+      <AppButton title="Logout" variant="secondary" onPress={handleLogout} style={styles.logoutButton} />
     </>
   );
 
@@ -48,6 +52,7 @@ const HomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -57,51 +62,44 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: Colors.background,
   },
   listContent: {
     padding: 16,
-    paddingBottom: 28,
+    paddingBottom: 30,
   },
   headerContainer: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#475569',
-    marginBottom: 8,
+    color: Colors.textSecondary,
+    marginBottom: 10,
+  },
+  emptyContainer: {
+    backgroundColor: Colors.infoSoft,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 12,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
   logoutButton: {
-    marginTop: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  secondaryButton: {
-    marginTop: 8,
-    backgroundColor: '#0EA5E9',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  logoutButtonText: {
-    color: '#0F172A',
-    fontWeight: '600',
+    marginTop: 10,
   },
 });
 

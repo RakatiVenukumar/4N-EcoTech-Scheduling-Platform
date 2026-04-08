@@ -1,5 +1,7 @@
 import React from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AppButton from '../components/AppButton';
+import { Colors } from '../constants/colors';
 
 const ProviderDetailsScreen = ({ route, navigation }) => {
   const { provider } = route.params;
@@ -21,15 +23,16 @@ const ProviderDetailsScreen = ({ route, navigation }) => {
           <Text style={styles.description}>{provider.description}</Text>
 
           <Text style={styles.sectionTitle}>Available Slots</Text>
+          {provider.availableSlots.length === 0 ? (
+            <Text style={styles.emptySlots}>No available slots right now.</Text>
+          ) : null}
           {provider.availableSlots.map((slot) => (
             <Text key={slot} style={styles.slotItem}>
               {new Date(slot).toLocaleString()}
             </Text>
           ))}
 
-          <TouchableOpacity style={styles.bookButton} onPress={handleBookAppointment}>
-            <Text style={styles.bookButtonText}>Book Appointment</Text>
-          </TouchableOpacity>
+          <AppButton title="Book Appointment" onPress={handleBookAppointment} style={styles.bookButton} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -39,7 +42,7 @@ const ProviderDetailsScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7FAFC',
+    backgroundColor: Colors.background,
   },
   container: {
     padding: 16,
@@ -49,56 +52,54 @@ const styles = StyleSheet.create({
     height: 230,
     borderRadius: 14,
     marginBottom: 14,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.border,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
     padding: 16,
   },
   name: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   category: {
     fontSize: 15,
-    color: '#475569',
+    color: Colors.textSecondary,
     marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1E293B',
+    color: Colors.textPrimary,
     marginTop: 8,
     marginBottom: 6,
   },
   description: {
-    color: '#334155',
+    color: Colors.textSecondary,
     lineHeight: 22,
   },
   slotItem: {
-    color: '#0F172A',
-    backgroundColor: '#F1F5F9',
+    color: Colors.textPrimary,
+    backgroundColor: Colors.infoSoft,
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 10,
     marginBottom: 8,
   },
+  emptySlots: {
+    color: Colors.textSecondary,
+    backgroundColor: Colors.infoSoft,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+  },
   bookButton: {
     marginTop: 10,
-    backgroundColor: '#0EA5E9',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  bookButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
   },
 });
 

@@ -1,5 +1,8 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+
+import AppButton from './AppButton';
+import { Colors } from '../constants/colors';
 
 const ProviderCard = ({ provider, onViewDetails }) => {
   return (
@@ -10,9 +13,7 @@ const ProviderCard = ({ provider, onViewDetails }) => {
         <Text style={styles.name}>{provider.name}</Text>
         <Text style={styles.category}>{provider.category}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={onViewDetails}>
-          <Text style={styles.buttonText}>View Details</Text>
-        </TouchableOpacity>
+        <AppButton title="View Details" onPress={onViewDetails} />
       </View>
     </View>
   );
@@ -20,42 +21,32 @@ const ProviderCard = ({ provider, onViewDetails }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
     marginBottom: 14,
     overflow: 'hidden',
   },
   image: {
     width: '100%',
     height: 170,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: Colors.border,
   },
   content: {
     padding: 14,
+    gap: 4,
   },
   name: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F172A',
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   category: {
     fontSize: 14,
-    color: '#475569',
+    color: Colors.textSecondary,
     marginBottom: 12,
-  },
-  button: {
-    backgroundColor: '#0EA5E9',
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
 
