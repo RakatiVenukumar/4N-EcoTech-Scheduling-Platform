@@ -9,6 +9,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProviderDetailsScreen from '../screens/ProviderDetailsScreen';
+import BookAppointmentScreen from '../screens/BookAppointmentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +66,13 @@ const AppNavigator = () => {
             component={ProviderDetailsScreen}
             options={{
               title: 'Provider Details',
+            }}
+          />
+          <Stack.Screen
+            name="BookAppointment"
+            component={BookAppointmentScreen}
+            options={{
+              title: 'Book Appointment',
             }}
           />
         </Stack.Navigator>

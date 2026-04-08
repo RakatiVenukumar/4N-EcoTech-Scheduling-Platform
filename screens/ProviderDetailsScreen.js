@@ -1,11 +1,11 @@
 import React from 'react';
-import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const ProviderDetailsScreen = ({ route }) => {
+const ProviderDetailsScreen = ({ route, navigation }) => {
   const { provider } = route.params;
 
   const handleBookAppointment = () => {
-    Alert.alert('Appointment', `Booking flow for ${provider.name} will be added next.`);
+    navigation.navigate('BookAppointment', { provider });
   };
 
   return (
