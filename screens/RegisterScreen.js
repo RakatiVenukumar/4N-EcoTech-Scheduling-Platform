@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import AppButton from '../components/AppButton';
 import { Colors } from '../constants/colors';
+import { validateEmail, validateName, validatePassword } from '../src/utils/validation';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -10,11 +11,15 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register } = useAuth();
+  const { register, error: authBootstrapError } = useAuth();
 
   const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      setError('All fields are required.');
+    const nameError = validateName(name);
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+
+    if (nameError || emailError || passwordError) {
+      setError(nameError || emailError || passwordError);
       return;
     }
 
@@ -37,10 +42,17 @@ const RegisterScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>Register to get started.</Text>
 
         <View style={styles.formCard}>
+          {authBootstrapError ? <Text style={styles.errorText}>{authBootstrapError}</Text> : null}
+
           <Text style={styles.label}>Name</Text>
           <TextInput
             value={name}
-            onChangeText={setName}
+            onChangeText={(value) => {
+              setName(value);
+              if (error) {
+                setError('');
+              }
+            }}
             placeholder="Enter your name"
             autoCapitalize="words"
             autoCorrect={false}
@@ -50,7 +62,12 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.label}>Email</Text>
           <TextInput
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(value) => {
+              setEmail(value);
+              if (error) {
+                setError('');
+              }
+            }}
             placeholder="Enter your email"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -61,7 +78,12 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.label}>Password</Text>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(value) => {
+              setPassword(value);
+              if (error) {
+                setError('');
+              }
+            }}
             placeholder="Enter your password"
             secureTextEntry
             autoCapitalize="none"

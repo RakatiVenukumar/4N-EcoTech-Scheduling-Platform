@@ -3,17 +3,21 @@ import { SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import AppButton from '../components/AppButton';
 import { Colors } from '../constants/colors';
+import { validateEmail, validatePassword } from '../src/utils/validation';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, error: authBootstrapError } = useAuth();
 
   const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError('Email and password are required.');
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+
+    if (emailError || passwordError) {
+      setError(emailError || passwordError);
       return;
     }
 
@@ -36,10 +40,17 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>Sign in to continue.</Text>
 
         <View style={styles.formCard}>
+          {authBootstrapError ? <Text style={styles.errorText}>{authBootstrapError}</Text> : null}
+
           <Text style={styles.label}>Email</Text>
           <TextInput
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(value) => {
+              setEmail(value);
+              if (error) {
+                setError('');
+              }
+            }}
             placeholder="Enter your email"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -50,7 +61,12 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.label}>Password</Text>
           <TextInput
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(value) => {
+              setPassword(value);
+              if (error) {
+                setError('');
+              }
+            }}
             placeholder="Enter your password"
             secureTextEntry
             autoCapitalize="none"

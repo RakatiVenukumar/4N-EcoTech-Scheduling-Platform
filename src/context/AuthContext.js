@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -22,6 +23,11 @@ export const AuthProvider = ({ children }) => {
 
         setUsers(initialState.users);
         setCurrentUser(initialState.currentUser);
+        setError('');
+      } catch (bootstrapError) {
+        if (isMounted) {
+          setError(bootstrapError.message || 'Unable to restore your session.');
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -60,12 +66,13 @@ export const AuthProvider = ({ children }) => {
       users,
       currentUser,
       isLoading,
+      error,
       isAuthenticated: Boolean(currentUser),
       register,
       login,
       logout,
     }),
-    [users, currentUser, isLoading, register, login, logout]
+    [users, currentUser, isLoading, error, register, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

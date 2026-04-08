@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import { useAppointments } from '../src/context/AppointmentContext';
@@ -31,6 +31,12 @@ const BookAppointmentScreen = ({ route }) => {
 
   const slotOptions = useMemo(() => provider?.availableSlots ?? [], [provider]);
 
+  useEffect(() => {
+    if (!currentUser?.email) {
+      setError('Please log in again to continue booking.');
+    }
+  }, [currentUser]);
+
   const handleSelectSlot = (slotValue) => {
     const slotDate = new Date(slotValue);
     const nextAppointment = {
@@ -48,6 +54,12 @@ const BookAppointmentScreen = ({ route }) => {
 
   const handleConfirmBooking = async () => {
     if (!appointment) {
+      setError('Please select an available slot.');
+      return;
+    }
+
+    if (!currentUser?.email) {
+      setError('Please log in again to continue booking.');
       return;
     }
 
@@ -66,6 +78,9 @@ const BookAppointmentScreen = ({ route }) => {
       'Booking Confirmed',
       `${appointment.providerName} on ${appointment.date} at ${appointment.time}`
     );
+
+    setSelectedSlot(null);
+    setAppointment(null);
   };
 
   return (

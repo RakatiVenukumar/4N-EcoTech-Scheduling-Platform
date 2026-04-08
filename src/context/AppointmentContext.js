@@ -9,6 +9,7 @@ export const AppointmentProvider = ({ children }) => {
   const { currentUser } = useAuth();
   const [allAppointments, setAllAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -18,6 +19,11 @@ export const AppointmentProvider = ({ children }) => {
         const initialAppointments = await appointmentService.hydrateAppointments();
         if (isMounted) {
           setAllAppointments(initialAppointments);
+          setError('');
+        }
+      } catch (bootstrapError) {
+        if (isMounted) {
+          setError(bootstrapError.message || 'Unable to load appointments.');
         }
       } finally {
         if (isMounted) {
@@ -61,11 +67,12 @@ export const AppointmentProvider = ({ children }) => {
     () => ({
       appointments: getAppointments(),
       isLoading,
+      error,
       bookAppointment,
       cancelAppointment,
       getAppointments,
     }),
-    [getAppointments, isLoading, bookAppointment, cancelAppointment]
+    [getAppointments, isLoading, error, bookAppointment, cancelAppointment]
   );
 
   return <AppointmentContext.Provider value={value}>{children}</AppointmentContext.Provider>;

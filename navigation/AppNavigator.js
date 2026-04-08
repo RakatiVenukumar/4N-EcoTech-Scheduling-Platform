@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuth } from '../src/context/AuthContext';
+import { Colors } from '../constants/colors';
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -26,7 +27,7 @@ const AppNavigator = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <ActivityIndicator size="large" color="#0EA5E9" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       </GestureHandlerRootView>
     );
@@ -39,6 +40,11 @@ const AppNavigator = () => {
           initialRouteName={isAuthenticated ? 'Home' : 'Login'}
           screenOptions={{
             headerTitleAlign: 'center',
+            headerShadowVisible: false,
+            headerStyle: {
+              backgroundColor: Colors.surface,
+            },
+            headerTintColor: Colors.textPrimary,
           }}>
           <Stack.Screen
             name="Login"

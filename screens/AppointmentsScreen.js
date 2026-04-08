@@ -6,7 +6,7 @@ import AppButton from '../components/AppButton';
 import { Colors } from '../constants/colors';
 
 const AppointmentsScreen = () => {
-  const { appointments, cancelAppointment, isLoading } = useAppointments();
+  const { appointments, cancelAppointment, isLoading, error } = useAppointments();
 
   const upcomingAppointments = useMemo(() => {
     const today = new Date();
@@ -84,7 +84,12 @@ const AppointmentsScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={<Text style={styles.title}>Upcoming Appointments</Text>}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.title}>Upcoming Appointments</Text>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          </>
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyTitle}>No upcoming appointments</Text>
@@ -157,6 +162,11 @@ const styles = StyleSheet.create({
   loaderText: {
     color: Colors.textSecondary,
     fontSize: 14,
+  },
+  errorText: {
+    color: Colors.danger,
+    fontSize: 13,
+    marginBottom: 10,
   },
 });
 
