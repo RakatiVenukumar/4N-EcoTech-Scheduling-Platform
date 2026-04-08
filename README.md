@@ -23,17 +23,11 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+You can start developing by editing the files inside the **src** directory. The app now uses a conventional React Navigation entry point, with `App.js` kept intentionally minimal.
 
 ## Get a fresh project
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The starter project layout has been replaced with a scalable `src` structure for screens, navigation, shared components, context, data, and utilities.
 
 ## Learn more
 
