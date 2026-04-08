@@ -68,10 +68,12 @@ const AppointmentsScreen = () => {
   const renderItem = ({ item }) => {
     return (
       <View style={styles.card}>
-        <Text style={styles.providerName}>{item.providerName}</Text>
-        <Text style={styles.meta}>Time: {item.time}</Text>
+        <View style={styles.cardTopRow}>
+          <Text style={styles.providerName}>{item.providerName}</Text>
+          <Text style={styles.statusPill}>{item.status}</Text>
+        </View>
         <Text style={styles.meta}>Date: {item.date}</Text>
-        <Text style={styles.meta}>Status: {item.status}</Text>
+        <Text style={styles.meta}>Time: {item.time}</Text>
 
         <AppButton title="Cancel" variant="secondary" onPress={() => handleCancel(item.id)} />
       </View>
@@ -98,6 +100,7 @@ const AppointmentsScreen = () => {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
+            <Text style={styles.eyebrow}>Your Schedule</Text>
             <Text style={styles.title}>Upcoming Appointments</Text>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </>
@@ -121,39 +124,73 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingBottom: 24,
+    paddingBottom: 28,
+  },
+  eyebrow: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.primary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 6,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '800',
     color: Colors.textPrimary,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
+    borderColor: Colors.borderStrong,
+    borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 14,
     gap: 2,
+    shadowColor: Colors.shadow,
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 4,
   },
-  providerName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.textPrimary,
+  cardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 6,
   },
+  providerName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+  },
+  statusPill: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    color: Colors.success,
+    backgroundColor: Colors.successSoft,
+    borderRadius: 999,
+    overflow: 'hidden',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   meta: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 4,
+    fontSize: 15,
+    color: Colors.textMuted,
+    marginBottom: 6,
   },
   emptyContainer: {
     backgroundColor: Colors.infoSoft,
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 16,
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   emptyTitle: {
     fontSize: 16,

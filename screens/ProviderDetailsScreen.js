@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import AppButton from '../components/AppButton';
 import { Colors } from '../constants/colors';
 
 const ProviderDetailsScreen = ({ route, navigation }) => {
   const { provider } = route.params;
+  const [hasImageError, setHasImageError] = useState(false);
+  const imageSource = useMemo(() => {
+    if (!hasImageError && provider?.profileImage) {
+      return { uri: provider.profileImage };
+    }
+
+    return require('../assets/images/icon.png');
+  }, [hasImageError, provider?.profileImage]);
 
   const handleBookAppointment = () => {
     navigation.navigate('BookAppointment', { provider });
@@ -13,8 +21,13 @@ const ProviderDetailsScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.heroMetaRow}>
+          <Text style={styles.eyebrow}>Provider Profile</Text>
+          <Text style={styles.tag}>{provider.category}</Text>
+        </View>
+
         <View style={styles.imageContainer}>
-          <Image source={{ uri: provider.profileImage }} style={styles.image} resizeMode="contain" />
+          <Image source={imageSource} style={styles.image} resizeMode="contain" onError={() => setHasImageError(true)} />
         </View>
 
         <View style={styles.card}>
@@ -48,67 +61,115 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
+    paddingBottom: 24,
+  },
+  heroMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  eyebrow: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: Colors.primary,
+  },
+  tag: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    backgroundColor: Colors.infoSoft,
+    borderRadius: 999,
+    overflow: 'hidden',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   imageContainer: {
     width: '100%',
-    height: 230,
-    borderRadius: 14,
-    marginBottom: 14,
-    backgroundColor: Colors.border,
+    height: 250,
+    borderRadius: 20,
+    marginBottom: 16,
+    backgroundColor: Colors.backgroundAccent,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    shadowColor: Colors.shadow,
+    shadowOpacity: 0.26,
+    shadowRadius: 14,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 4,
   },
   image: {
     width: '100%',
     height: '100%',
   },
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 14,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
-    padding: 16,
+    borderColor: Colors.borderStrong,
+    padding: 18,
+    shadowColor: Colors.shadow,
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 4,
   },
   name: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 30,
+    fontWeight: '800',
     color: Colors.textPrimary,
     marginBottom: 4,
   },
   category: {
-    fontSize: 15,
-    color: Colors.textSecondary,
+    fontSize: 16,
+    color: Colors.textMuted,
     marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     color: Colors.textPrimary,
-    marginTop: 8,
-    marginBottom: 6,
+    marginTop: 10,
+    marginBottom: 8,
   },
   description: {
-    color: Colors.textSecondary,
-    lineHeight: 22,
+    color: Colors.textMuted,
+    lineHeight: 24,
+    fontSize: 15,
   },
   slotItem: {
     color: Colors.textPrimary,
     backgroundColor: Colors.infoSoft,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    marginBottom: 8,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 9,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    fontWeight: '600',
   },
   emptySlots: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     backgroundColor: Colors.infoSoft,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 10,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   bookButton: {
-    marginTop: 10,
+    marginTop: 12,
   },
 });
 

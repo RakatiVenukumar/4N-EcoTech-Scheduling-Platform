@@ -38,6 +38,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
   );
 
   const bookedSlotKeys = useMemo(() => {
+    // Build quick lookup for occupied slots to disable unavailable options in UI.
     return new Set(
       appointments
         .filter((item) => item.providerName === provider.name && item.status !== 'cancelled')
@@ -159,6 +160,7 @@ const BookAppointmentScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        {/* Screen works in two modes: initial booking mode and post-booking reschedule mode. */}
         {!bookedAppointment ? (
           <>
             <Text style={styles.title}>Book Appointment</Text>

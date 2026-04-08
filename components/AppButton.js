@@ -46,23 +46,33 @@ const AppButton = ({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    borderRadius: 12,
+    minHeight: 52,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
   },
   primary: {
     backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.24,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    elevation: 5,
   },
   secondary: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.borderStrong,
   },
   disabled: {
     backgroundColor: Colors.primaryDisabled,
     borderColor: Colors.primaryDisabled,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   content: {
     flexDirection: 'row',
@@ -70,8 +80,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   label: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   primaryLabel: {
     color: Colors.surface,

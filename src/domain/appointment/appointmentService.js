@@ -60,6 +60,7 @@ export const appointmentService = {
       };
     });
 
+    // Persist only when hydration cleanup actually changed stored data.
     const hasChanged =
       singleActivePerProvider.length !== allAppointments.length ||
       JSON.stringify(singleActivePerProvider) !== JSON.stringify(allAppointments);
@@ -198,7 +199,7 @@ export const appointmentService = {
       throw new Error('This slot is no longer available. Please select a different time.');
     }
 
-    // Cancel the old appointment and book the new one in a single step
+    // First pass: mark old appointment inactive so conflict checks remain accurate.
     const updatedAppointments = allAppointments.map((item) => {
       if (item.id === oldAppointmentId) {
         // Cancel the old appointment
@@ -210,10 +211,10 @@ export const appointmentService = {
       return item;
     });
 
-    // Add the new appointment with same ID as old one (update pattern)
+    // Second pass: replace the cancelled record with updated slot details.
     const finalAppointments = updatedAppointments.map((item) => {
       if (item.id === oldAppointmentId && item.status === 'cancelled') {
-        // Replace with new appointment details but keep the ID
+        // Keep the same id so UI references and future actions remain stable.
         return {
           ...newAppointment,
           id: oldAppointmentId,

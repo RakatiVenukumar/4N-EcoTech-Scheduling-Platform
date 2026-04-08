@@ -36,6 +36,9 @@ const LoginScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        <View style={styles.orbLarge} />
+        <View style={styles.orbSmall} />
+        <Text style={styles.eyebrow}>EcoTech Scheduling</Text>
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue.</Text>
 
@@ -55,6 +58,7 @@ const LoginScreen = ({ navigation }) => {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            placeholderTextColor={Colors.textMuted}
             style={styles.input}
           />
 
@@ -71,6 +75,7 @@ const LoginScreen = ({ navigation }) => {
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
+            placeholderTextColor={Colors.textMuted}
             style={styles.input}
           />
 
@@ -99,40 +104,77 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
+    position: 'relative',
+  },
+  orbLarge: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 999,
+    backgroundColor: Colors.infoSoft,
+    top: 120,
+    right: -90,
+  },
+  orbSmall: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 999,
+    backgroundColor: Colors.accentSoft,
+    bottom: 160,
+    left: -30,
+  },
+  eyebrow: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.primary,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 10,
   },
   title: {
-    fontSize: 30,
-    fontWeight: '700',
+    fontSize: 40,
+    fontWeight: '800',
     color: Colors.textPrimary,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.textSecondary,
-    marginBottom: 28,
+    color: Colors.textMuted,
+    marginBottom: 24,
   },
   formCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 18,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: 20,
+    padding: 20,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.borderStrong,
     gap: 4,
+    shadowColor: Colors.shadow,
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 5,
   },
   label: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: 15,
+    color: Colors.secondary,
     marginBottom: 8,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   input: {
-    height: 50,
+    height: 54,
     borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 10,
+    borderColor: Colors.borderStrong,
+    borderRadius: 14,
     paddingHorizontal: 14,
     marginBottom: 14,
     backgroundColor: Colors.surface,
+    color: Colors.textPrimary,
+    fontSize: 17,
   },
   errorText: {
     color: Colors.danger,

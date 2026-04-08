@@ -1,44 +1,147 @@
-# Welcome to your Expo app 👋
+# 4N EcoTech Scheduling Platform
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native scheduling application built for the 4N EcoTech assignment.
 
-## Get started
+## Overview
+
+This app allows users to register, log in, browse service providers, book appointments, manage upcoming bookings, and reschedule/cancel appointments.
+
+The project is designed with a clean architecture split into:
+
+- `screens/` for UI flows
+- `components/` for reusable UI building blocks
+- `src/context/` for global state and app actions
+- `src/domain/` for booking business rules
+- `src/data/storage/` for persistence
+
+## Features Implemented
+
+- User registration and login (mock/local persistence)
+- Session handling and logout
+- Service provider listing with images and categories
+- Provider details with available slots
+- Appointment booking with slot selection
+- Upcoming appointments list
+- Appointment cancellation with confirmation
+- Reschedule flow from booking screen
+- Duplicate and conflict prevention
+- One active appointment per user per provider rule
+- UI fallbacks for image loading and storage behavior across web/mobile
+
+## Business Rules
+
+- Same slot cannot be booked by two active appointments.
+- One user can have only one active appointment per provider.
+- User can have active appointments with different providers.
+- Cancelled appointments are excluded from active slot checks.
+- Reschedule preserves ownership and updates to a free slot only.
+
+## Tech Stack
+
+- React Native
+- Expo
+- React Navigation
+- Context API
+- AsyncStorage (with Expo-safe fallback wrapper)
+- JavaScript (ES6+)
+
+## Project Structure
+
+```text
+4N-EcoTech-Scheduling-Platform/
+   components/
+      AppButton.js
+      ProviderCard.js
+   constants/
+      colors.js
+   data/
+      providers.js
+   navigation/
+      AppNavigator.js
+   screens/
+      LoginScreen.js
+      RegisterScreen.js
+      HomeScreen.js
+      ProviderDetailsScreen.js
+      BookAppointmentScreen.js
+      AppointmentsScreen.js
+   src/
+      context/
+         AuthContext.js
+         AppointmentContext.js
+      domain/
+         appointment/
+            appointmentService.js
+      data/storage/
+         authStorage.js
+         appointmentStorage.js
+         safeStorage.js
+      utils/
+         validation.js
+```
+
+## Setup and Run
 
 1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. Start the app
+2. Start Expo
 
-   ```bash
-   npx expo start
-   ```
+```bash
+npx expo start
+```
 
-In the output, you'll find options to open the app in a
+3. Run on target
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Web: press `w` in Expo terminal
+- Android Emulator: press `a`
+- Expo Go on device: scan QR code
 
-You can start developing by editing the files inside the **src** directory. The app now uses a conventional React Navigation entry point, with `App.js` kept intentionally minimal.
+## Android APK Build (Recommended for final submission)
 
-## Get a fresh project
+If submitting APK, build a release APK using EAS:
 
-The starter project layout has been replaced with a scalable `src` structure for screens, navigation, shared components, context, data, and utilities.
+```bash
+npm install -g eas-cli
+eas login
+eas build:configure
+eas build -p android --profile preview
+```
 
-## Learn more
+Download the generated APK from the EAS build link and verify install on a physical Android device.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Assumptions
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- No backend server is used for assignment scope; data is local/mock.
+- Provider slots are predefined in seed data.
+- Notifications and calendar integration are out of scope.
 
-## Join the community
+## Expo Go Note
 
-Join our community of developers creating universal apps.
+Expo Go can have differences in native storage behavior. The project includes `safeStorage` fallback to keep flows testable even when native storage is unavailable.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Quality and Validation
+
+- Input validation for name, email, and password
+- Error handling with user-friendly messages
+- Loading states on async actions
+- Empty states for providers/appointments/slots
+- Defensive hydration cleanup for appointment data integrity
+
+## Libraries and Tools Used
+
+- `@react-native-async-storage/async-storage`
+- `@react-navigation/native`
+- `@react-navigation/native-stack`
+- Expo SDK tooling
+
+## Submission Checklist
+
+- Source code repository
+- Updated README
+- APK file
+- PPT/PDF with Part I and Part II
+- Notes on assumptions, tools, and architecture
