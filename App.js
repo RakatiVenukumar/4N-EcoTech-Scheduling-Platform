@@ -1,3 +1,12 @@
 import AppNavigator from './navigation/AppNavigator';
+import { AuthProvider } from './src/context/AuthContext';
 
-export default AppNavigator;
+const App = () => {
+	return (
+		<AuthProvider>
+			<AppNavigator />
+		</AuthProvider>
+	);
+};
+
+export default App;
