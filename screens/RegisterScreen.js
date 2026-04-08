@@ -1,29 +1,85 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const RegisterScreen = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleRegister = () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError('All fields are required.');
+      return;
+    }
+
+    setError('');
+    navigation.replace('Home');
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitle}>Register to get started.</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Register to get started.</Text>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => navigation.replace('Home')}>
-        <Text style={styles.primaryButtonText}>Register</Text>
-      </TouchableOpacity>
+        <View style={styles.formCard}>
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter your name"
+            autoCapitalize="words"
+            autoCorrect={false}
+            style={styles.input}
+          />
 
-      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.secondaryButtonText}>Back to login</Text>
-      </TouchableOpacity>
-    </View>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            style={styles.input}
+          />
+
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Enter your password"
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            style={styles.input}
+          />
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
+            <Text style={styles.primaryButtonText}>Register</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.secondaryButtonText}>Back to login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F7FAFC',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F7FAFC',
   },
   title: {
     fontSize: 30,
@@ -36,8 +92,35 @@ const styles = StyleSheet.create({
     color: '#475569',
     marginBottom: 28,
   },
+  formCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  label: {
+    fontSize: 14,
+    color: '#334155',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  input: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  errorText: {
+    color: '#DC2626',
+    marginBottom: 10,
+    fontSize: 13,
+  },
   primaryButton: {
-    backgroundColor: '#22C55E',
+    backgroundColor: '#0EA5E9',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
