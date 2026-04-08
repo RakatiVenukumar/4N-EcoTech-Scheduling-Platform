@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
+import providers from '../data/providers';
+import ProviderCard from '../components/ProviderCard';
 
 const HomeScreen = ({ navigation }) => {
   const { currentUser, logout } = useAuth();
@@ -10,30 +12,56 @@ const HomeScreen = ({ navigation }) => {
     navigation.replace('Login');
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Text style={styles.subtitle}>
-        {currentUser ? `Welcome, ${currentUser.name}.` : 'You are now inside the app.'}
-      </Text>
+  const handleViewDetails = (provider) => {
+    navigation.navigate('ProviderDetails', { provider });
+  };
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <Text style={styles.title}>Service Providers</Text>
+      <Text style={styles.subtitle}>
+        {currentUser ? `Welcome, ${currentUser.name}.` : 'Discover the best providers for your needs.'}
+      </Text>
     </View>
+  );
+
+  const renderFooter = () => (
+    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <Text style={styles.logoutButtonText}>Logout</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={providers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <ProviderCard provider={item} onViewDetails={() => handleViewDetails(item)} />
+        )}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F7FAFC',
+  },
+  listContent: {
+    padding: 16,
+    paddingBottom: 28,
+  },
+  headerContainer: {
+    marginBottom: 12,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: '#0F172A',
     marginBottom: 8,
@@ -41,14 +69,17 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#475569',
-    marginBottom: 24,
+    marginBottom: 8,
   },
   logoutButton: {
+    marginTop: 8,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#CBD5E1',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    alignItems: 'center',
   },
   logoutButtonText: {
     color: '#0F172A',

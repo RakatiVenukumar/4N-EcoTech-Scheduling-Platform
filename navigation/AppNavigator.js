@@ -8,6 +8,7 @@ import { useAuth } from '../src/context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
+import ProviderDetailsScreen from '../screens/ProviderDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +58,13 @@ const AppNavigator = () => {
             options={{
               title: 'Home',
               headerBackVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="ProviderDetails"
+            component={ProviderDetailsScreen}
+            options={{
+              title: 'Provider Details',
             }}
           />
         </Stack.Navigator>
