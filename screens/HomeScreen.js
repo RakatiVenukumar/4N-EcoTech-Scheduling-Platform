@@ -26,9 +26,15 @@ const HomeScreen = ({ navigation }) => {
   );
 
   const renderFooter = () => (
-    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-      <Text style={styles.logoutButtonText}>Logout</Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Appointments')}>
+        <Text style={styles.secondaryButtonText}>View Appointments</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
+    </>
   );
 
   return (
@@ -80,6 +86,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
+  },
+  secondaryButton: {
+    marginTop: 8,
+    backgroundColor: '#0EA5E9',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   logoutButtonText: {
     color: '#0F172A',

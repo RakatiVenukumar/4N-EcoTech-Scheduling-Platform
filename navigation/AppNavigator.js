@@ -10,6 +10,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProviderDetailsScreen from '../screens/ProviderDetailsScreen';
 import BookAppointmentScreen from '../screens/BookAppointmentScreen';
+import AppointmentsScreen from '../screens/AppointmentsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -73,6 +74,13 @@ const AppNavigator = () => {
             component={BookAppointmentScreen}
             options={{
               title: 'Book Appointment',
+            }}
+          />
+          <Stack.Screen
+            name="Appointments"
+            component={AppointmentsScreen}
+            options={{
+              title: 'Appointments',
             }}
           />
         </Stack.Navigator>
