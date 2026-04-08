@@ -1,8 +1,12 @@
 import React from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const ProviderDetailsScreen = ({ route }) => {
   const { provider } = route.params;
+
+  const handleBookAppointment = () => {
+    Alert.alert('Appointment', `Booking flow for ${provider.name} will be added next.`);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -22,6 +26,10 @@ const ProviderDetailsScreen = ({ route }) => {
               {new Date(slot).toLocaleString()}
             </Text>
           ))}
+
+          <TouchableOpacity style={styles.bookButton} onPress={handleBookAppointment}>
+            <Text style={styles.bookButtonText}>Book Appointment</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -79,6 +87,18 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
     marginBottom: 8,
+  },
+  bookButton: {
+    marginTop: 10,
+    backgroundColor: '#0EA5E9',
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  bookButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
 
